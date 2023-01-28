@@ -1,0 +1,227 @@
+@font-face {
+    font-family: 'viking';
+    src: url("./fonts/Viking-Normal.otf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'norse';
+    src: url("./fonts/Norse.otf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'norse';
+    src: url("./fonts/Norse-Bold.otf");
+    font-weight: bold;
+    font-style: normal;
+}
+
+.card {
+    margin: 0.5mm;
+    border-style: solid;
+    border-width: 3mm;
+    border-color: black;
+    border-radius: 3mm;
+    width: 63mm;
+    height: 88mm;
+}
+
+.card-in {
+    position: absolute;
+    width: inherit;
+    height: inherit;
+    background-repeat: repeat;
+    z-index: 10;
+}
+
+.card-personnage,
+.card-monstre1,
+.card-monstre2,
+.card-monstre3,
+.card-monstre4 {
+    background-image: url("./cardFrame.png");
+}
+
+.card-equipement,
+.card-bonus,
+.card-malus,
+.card-piege,
+.card-instant,
+.card-evenement {
+    background-image: url("./cardFrame2.png");
+}
+
+.card-level-cost {
+    position: absolute;
+    font-family: 'viking';
+    width: 30px;
+    height: 30px;
+    right: 3px;
+    top: 5px;
+    color: rgb(255, 255, 255);
+    text-align: center;
+    background-repeat: no-repeat;
+    /*font-weight: bold;*/
+}
+
+.cost-personnage {
+    padding-top: 6px;
+    font-size: 15px;
+    background-image: url('./icons/eolic-energy-svgrepo-com.svg');
+}
+.cost-equipement,
+.cost-bonus,
+.cost-malus,
+.cost-piege,
+.cost-instant {
+    width: 25px;
+    padding-top: 10px;
+    padding-left: 5px;
+    font-size: 13px;
+    background-image: url('./icons/beer-stein.svg');
+}
+
+.avatar {
+    position: absolute;
+    width: 222px;
+    height: 222px;
+    margin-top: 12px;
+    margin-left: 12px;
+    background-size: cover;
+    z-index: 0;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.avatar-equipement,
+.avatar-bonus,
+.avatar-malus,
+.avatar-piege,
+.avatar-instant,
+.avatar-evenement {
+    height: 138px;
+    width: 202px;
+    margin-top: 22px;
+    margin-left: 22px;
+}
+
+.title {
+    /*float: left;*/
+    margin-top: 160px;
+    margin-left: 5mm;
+    width: 60mm;
+    height: 5mm;
+    font-family: 'norse';
+    font-weight: bold;
+    font-size: 13pt;
+    padding: 3px 0;
+}
+.card-personnage .title,
+.card-monstre1 .title,
+.card-monstre2 .title,
+.card-monstre3 .title,
+.card-monstre4 .title {
+    margin-top: 233px;
+}
+
+.name {
+    float: left;
+}
+.type {
+    float: right;
+    width: 16px;
+    height: 16px;
+    margin-top: 1px;
+    background-size: contain;
+}
+
+.container {
+    width: 57mm;
+    height: 33mm;
+    margin-left: 4mm;
+    padding: 3px 0;
+}
+.card-personnage .container,
+.card-monstre1 .container,
+.card-monstre2 .container,
+.card-monstre3 .container,
+.card-monstre4 .container {
+    height: 15mm;
+}
+
+table[class^='carac'] {
+    font-family: 'viking';
+    font-weight: bold;
+    font-size: 10pt;
+    width: 100%;
+    padding: 0 10%;
+    text-align: center;
+    margin: 3px 0;
+}
+.carac {
+    display: none;
+}
+
+table[class^='carac'] tr td[class^='for'],
+table[class^='carac'] tr td[class^='agi'],
+table[class^='carac'] tr td[class^='cha'] {
+
+}
+.for, .agi, .cha {
+    display: none;
+}
+
+.icon {
+    width: 5mm;
+    height: 5mm;
+    vertical-align: middle;
+}
+
+div[class^='texte'] {
+    float:left;
+    height: 10mm;
+    font-family: "Helvetica";
+    font-size: 9pt;
+    margin: 1.5mm 2mm;
+    width: 52mm;
+    height: 58%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+div.texte {
+    height: 82%;
+}
+
+.card-personnage div[class^='texte'],
+.card-monstre1 div[class^='texte'],
+.card-monstre2 div[class^='texte'],
+.card-monstre3 div[class^='texte'],
+.card-monstre4 div[class^='texte'] {
+    display: none;
+}
+
+.ambiance {
+    float:left;
+    font-family: "Helvetica";
+    font-size: 7pt;
+    font-style: italic;
+    margin: 0;
+    text-align: center;
+    width: 80%;
+    height: 38%;
+    padding: 0 10%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.card-equipement .ambiance,
+.card-bonus .ambiance,
+.card-malus .ambiance,
+.card-piege .ambiance,
+.card-instant .ambiance,
+.card-evenement .ambiance {
+    display: none;
+}
