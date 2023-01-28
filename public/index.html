@@ -63,7 +63,9 @@
         <p>Create files in the Storage service to see them listed here in realtime.</p>
         <ul id="realtime" class="list-group" />
     </div>
-
+    <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="getUserName()">
+        Get User Name
+    </button>
     <script>
         $(document).ready(async function () {
             // console.log("document ready");
@@ -88,6 +90,17 @@
             window.AppwriteProjectID = getAppwriteProjectID;
             window.ServiceEndpoint = getServiceEndpoint
         }
+        function getUserName() {
+                let promise = account.get();
+                promise.then(
+                    function (response) {
+                        alert(response.name);
+                    },
+                    function (error) {
+                        alert("No User is Logged!");
+                    }
+                );
+            }
 
         function main() {
             window.client = new Appwrite.Client();// Before we start doing anything, we need to init our Appwrite Web SDK
@@ -142,18 +155,6 @@
             );
         }
 
-
-        function loginAnonymously() {
-            account.createAnonymousSession().then(
-                function (response) {
-                    alert("anonymous session created successfully!");
-                },
-                function (error) {
-                    alert("failed to create session");
-                }
-            );
-        }
-
         function createJWT() {
             account.createJWT().then(
                 function (response) {
@@ -165,27 +166,6 @@
                 }
             );
         }
-
-        function login(event) {
-            account
-                .createEmailSession(
-                    event.target.elements["login-email"].value, // Email
-                    event.target.elements["login-password"].value // Password
-                )
-                .then(
-                    function (response) {
-                        alert("Session created succefully!");
-                        client.subscribe("account", function (response) {
-                            console.log('Received Account event', response);
-                        });
-
-                    },
-                    function (error) {
-                        alert("Failed to create session");
-                    }
-                );
-        }
-
 
     </script>
 </body>
