@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,300,400,500,600,800" />
+    <link rel="icon" type="image/png" href="" />
+    <!-- jquery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <!-- Appwrite Web SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@9.0.1"></script>
+    <style>
+        body {
+            font-family: Poppins, sans-serif, Arial;
+            -webkit-font-smoothing: antialiased;
+            font-weight: 500;
+        }
+
+        #list>li:hover {
+            color: #007BFF;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <!-- CHANGE THE LINK HERE later -->
+        <a class="navbar-brand" href="https://github.com/dylanpoll">
+            <!-- github logo SVG taken from their site using inspector -->
+            <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
+                class="octicon octicon-mark-github v-align-middle" height="22">
+                <path fill-rule="evenodd"
+                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                </path>
+            </svg>
+            &nbsp;Github Repo
+        </a>
+    </nav>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-5 mb-5">TEST Title</h1>
+            <p class="lead">
+                test sub title content
+            </p>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2 class="mb-5">Login</h2>
+        <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="loginWithGithub()">
+            Login With Github
+        </button>
+    </div>
+    <div class="container">
+        <h2 class="mb-5">Realtime</h2>
+        <p>Create files in the Storage service to see them listed here in realtime.</p>
+        <ul id="realtime" class="list-group" />
+    </div>
+
+    <script>
+        $(document).ready(async function () {
+            // console.log("document ready");
+            await getClientConstVars();
+            // console.log("got constants");
+            printClientVars();
+            console.log("starting main");
+            main();
+        });
+
+        document.getElementById('uploader').onchange = function () {
+            document.getElementById('uploader-label').innerHTML = this.files[0].name;
+        };
+
+        function printClientVars() {
+            console.log("fileStorage buckit ID: " + fileStorageBuckitID + " | WebsiteDomainRoot: " + WebsiteDomainRoot + " | AppwriteProjectID: " + AppwriteProjectID + " | getServiceEndpoint: " + ServiceEndpoint)
+        }
+        async function getClientConstVars() {
+            let { getFileStorageBuckitID, getwebsiteDomainRoot, getAppwriteProjectID, getServiceEndpoint } = await import('https://test-appwrite.devdylan.us/clientSideConsts.js');
+            window.fileStorageBuckitID = getFileStorageBuckitID;
+            window.WebsiteDomainRoot = getwebsiteDomainRoot;
+            window.AppwriteProjectID = getAppwriteProjectID;
+            window.ServiceEndpoint = getServiceEndpoint
+        }
+
+        function main() {
+            window.client = new Appwrite.Client();// Before we start doing anything, we need to init our Appwrite Web SDK
+            client // your appwrite server info NOT THE WEBSITE RUNNING IT :(
+                .setEndpoint(ServiceEndpoint)
+                .setProject(AppwriteProjectID);
+            // Preparing all services we are going to use
+            window.account = new Appwrite.Account(client);
+            window.storage = new Appwrite.Storage(client);
+            window.teams = new Appwrite.Teams(client);
+            window.locale = new Appwrite.Locale(client);
+            window.realtimeElement = document.getElementById("realtime");
+            client.subscribe("files", function (response) {
+                const entry = document.createElement("li");
+                const image = storage.getFilePreview(fileStorageBuckitID, response.payload.$id, 250);
+                const url = storage.getFileView(fileStorageBuckitID, response.payload.$id, 250);
+                entry.classList.add('list-group-item');
+                entry.innerHTML = `<a href="${url}" target=_blank><b>Events</b>: ${response.events}<br><img src="${image}" /></a>`;
+                realtimeElement.prepend(entry);
+            });
+            client.subscribe(['teams', 'memberships', 'accounts'], function (response) {
+                console.log(response)
+            });
+        }
+
+        function loginWithGithub(event) {
+            let promise = account.createOAuth2Session(
+                "github",
+                WebsiteDomainRoot + "/?success", // Callback URL for success
+                WebsiteDomainRoot + "/?failure", // Callback URL for failure
+                []
+            );
+            promise.then(
+                function (response) {
+                    console.log(response); // Success
+                },
+                function (error) {
+                    console.log(error); // Failure
+                }
+            );
+        }
+
+        function isLogged() {
+            let promise = account.get();
+            promise.then(
+                function (response) {
+                    alert("User is Logged!");
+                },
+                function (error) {
+                    alert("No User is Logged!");
+                }
+            );
+        }
+
+
+        function loginAnonymously() {
+            account.createAnonymousSession().then(
+                function (response) {
+                    alert("anonymous session created successfully!");
+                },
+                function (error) {
+                    alert("failed to create session");
+                }
+            );
+        }
+
+        function createJWT() {
+            account.createJWT().then(
+                function (response) {
+                    console.log("JWT: ", response);
+                    alert("JWT created.");
+                },
+                function (error) {
+                    alert("failed to create session");
+                }
+            );
+        }
+
+        function login(event) {
+            account
+                .createEmailSession(
+                    event.target.elements["login-email"].value, // Email
+                    event.target.elements["login-password"].value // Password
+                )
+                .then(
+                    function (response) {
+                        alert("Session created succefully!");
+                        client.subscribe("account", function (response) {
+                            console.log('Received Account event', response);
+                        });
+
+                    },
+                    function (error) {
+                        alert("Failed to create session");
+                    }
+                );
+        }
+
+
+    </script>
+</body>
+
+</html>
