@@ -32,7 +32,7 @@
 <body>
     <nav class="navbar navbar-dark bg-dark">
         <!-- CHANGE THE LINK HERE later -->
-        <a class="navbar-brand" href="https://github.com/dylanpoll">
+        <a class="navbar-brand" href="https://github.com/dylanpoll/SwampIX">
             <!-- github logo SVG taken from their site using inspector -->
             <svg height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32" data-view-component="true"
                 class="octicon octicon-mark-github v-align-middle" height="22">
@@ -82,7 +82,7 @@
             console.log("fileStorage buckit ID: " + fileStorageBuckitID + " | WebsiteDomainRoot: " + WebsiteDomainRoot + " | AppwriteProjectID: " + AppwriteProjectID + " | getServiceEndpoint: " + ServiceEndpoint)
         }
         async function getClientConstVars() {
-            let { getFileStorageBuckitID, getwebsiteDomainRoot, getAppwriteProjectID, getServiceEndpoint } = await import('https://test-appwrite.devdylan.us/clientSideConsts.js');
+            let { getFileStorageBuckitID, getwebsiteDomainRoot, getAppwriteProjectID, getServiceEndpoint } = await import('https://swampix.devdylan.us/clientSideConsts.js');
             window.fileStorageBuckitID = getFileStorageBuckitID;
             window.WebsiteDomainRoot = getwebsiteDomainRoot;
             window.AppwriteProjectID = getAppwriteProjectID;
