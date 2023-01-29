@@ -1,5 +1,7 @@
 # SwampIX
 SwampHacks Project Repo
+link to Lev Vinokur's LinkedIn profile: https://www.linkedin.com/in/lev-vinokur-fl/
+Link to Dylan Poll's LinkedIn profile: https://www.linkedin.com/in/dylanpoll/
 
 this project is used to generate cards for a card game.
 

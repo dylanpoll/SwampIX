@@ -4,7 +4,7 @@ async function getCardName() {
     })     
     .then(response => response.text())
     .then(result => {
-      console.log(result);
+    //   console.log(result);
       return result
     })
     .catch(error => console.log('error', error));
@@ -31,12 +31,12 @@ function createCardStats() {
     let distribPoints = (6 * (castingCost + 1));        // equal to (6 * (castingCost + 1)), which is between 6 and 24 inclusive
 
     //Print out all attributes
-    console.log("castingCost " + castingCost);
-    console.log("attack " + attack);
-    console.log("defense " + defense);
-    console.log("health " + health);
-    console.log("deathDamage " + deathDamage);
-    console.log("distribPoints " + distribPoints);
+    // console.log("castingCost " + castingCost);
+    // console.log("attack " + attack);
+    // console.log("defense " + defense);
+    // console.log("health " + health);
+    // console.log("deathDamage " + deathDamage);
+    // console.log("distribPoints " + distribPoints);
     
     //Randomly add distrib points to either attack, defense, or health    
     let isComplete = 0;
@@ -44,48 +44,48 @@ function createCardStats() {
 
         //generate random number between 1 and 3 to decide how many distrib points are going to get allocated
         let selectedDistribPoints = Math.floor(Math.random() * 3) + 1; //returns between 1 and 3
-        console.log("The selected number of distrib points is: " + selectedDistribPoints);
+        // console.log("The selected number of distrib points is: " + selectedDistribPoints);
 
         //check if decrement is going to create negative number, if so, do not decrement number and isComplete = 1
         if((distribPoints - selectedDistribPoints) < 0){
-            console.log("Final distrib points: " + distribPoints);
-            console.log("isComplete is true ");
+            // console.log("Final distrib points: " + distribPoints);
+            // console.log("isComplete is true ");
             selectedDistribPoints = distribPoints;
             isComplete = 1; //we have completed our run
         }
         else{ //else decrement extracted points
             distribPoints = parseInt(distribPoints) - parseInt(selectedDistribPoints);
-            console.log("Decremented distrib points: " + distribPoints);
+            // console.log("Decremented distrib points: " + distribPoints);
         }
 
 
         //generate another random number between 1 and 3 to determine which attribute is going to be incremented
         let selectedAttribute = Math.floor(Math.random() * 3) + 1; //returns between 1 and 3
 
-        console.log("The selected attribute is: " + selectedAttribute);
+        // console.log("The selected attribute is: " + selectedAttribute);
 
         //increment selected value
         if(selectedAttribute == 1){
             attack = parseInt(attack) + parseInt(selectedDistribPoints);
-            console.log("attack is now: " + attack);
+            // console.log("attack is now: " + attack);
         }
         else if(selectedAttribute == 2){
             defense = parseInt(defense) + parseInt(selectedDistribPoints);
-            console.log("defense is now: " + defense);
+            // console.log("defense is now: " + defense);
         }
         else{
             health = parseInt(health) + parseInt(selectedDistribPoints);
-            console.log("health is now: " + health);
+            // console.log("health is now: " + health);
         }
 
     }while(isComplete != 1);
 
-    console.log("Final Stats: ")
-    console.log("castingCost " + castingCost);
-    console.log("attack " + attack);
-    console.log("defense " + defense);
-    console.log("health " + health);
-    console.log("deathDamage " + deathDamage);
+    // console.log("Final Stats: ")
+    // console.log("castingCost " + castingCost);
+    // console.log("attack " + attack);
+    // console.log("defense " + defense);
+    // console.log("health " + health);
+    // console.log("deathDamage " + deathDamage);
     
 
     return {"castingCost": castingCost, "attack": attack, "defense": defense, "health": health, "deathDamage": deathDamage};

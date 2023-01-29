@@ -39,20 +39,24 @@ function getUserName() {
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
   }
-function createTD(row){
-    const tableRow = document.createElement('td');
-    tableRow.setAttribute('id', 'row'+row);
+function createTable(){
+    let row = getRandomInt(50);
+    const tableRow = document.createElement('table');
+    tableRow.setAttribute('id',`mainCardTableid${row}`);
     tableRow.setAttribute('class', 'cardTable');
     tableRow.innerHTML = `
     `;
-    document.getElementById("mainCardTable").appendChild(tableRow);
-    return 'row'+row;
+    
+    // <tr id="cardTableRow${row}" class="cardTable">
+    // </tr>
+    document.getElementById("uploader").appendChild(tableRow);
+    return 'mainCardTableid'+row;
 }
 async function importAndGenerateCard() {
     const { generateCard } = await import('./generateCard.js');
     const { createCardStats, getCardName } = await import('./getCardName.js');
-    // let row = getRandomInt(50);
-    // let td = createTD(row);
+
+    // var table = createTable();
     for (let i = 0; i <= 4; i++) {
         
       
@@ -145,6 +149,8 @@ function isLogged() {
             <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="getUserName()"> Get User Name </button>
     
             <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="deleteCurrentSession()"> Logout </button>
+    
+            <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="createTD()"> make row </button>
         `;
         },
         function (error) {
