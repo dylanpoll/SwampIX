@@ -2,6 +2,8 @@ const express = require('express');  // retrieves the package
 const router = express.Router();
 const fetch = require('node-fetch');
 const bearerToken = process.env.OPENAI_API_KEY;
+const fs = require('fs');
+const axios = require('axios');
 
 const descriptors = ["the ugly", "the fair", "the terrible", "the unreasonable", "the fake", "the twit", "the big dumb", "the honorable", "the formidable", "the little"];
 const nameEndpoints =["https://monsternames-api.com/api/v1.0/goatmen",
@@ -33,7 +35,7 @@ router.get('/name', async (req, res) => {
     .catch(error => console.log('error', error));
 }),
 
-router.post('/', async (req, res) => {
+router.post('/createArt', async (req, res) => {
   try {
 
     console.log(req.body);
@@ -60,7 +62,14 @@ router.post('/', async (req, res) => {
     .then(response => { 
       return response.data[0].url; //get the url out of the json response body
     })
-    .then(result => res.json(result)) // this res.json() is what is sent back to the requesting client. anything used by res. would do that.
+    .then(result => {
+      return new Promise(async (resolve, reject) => {
+        let url = result;
+        let image_path = './public/resources/cardArt/'+stringToGenerateImageWith.replaceAll(' ','_')+'.png';
+        await saveImage(url,image_path.replaceAll('"',''));
+        res.json(stringToGenerateImageWith+'.png');
+      })
+    }) // this res.json() is what is sent back to the requesting client. anything used by res. would do that.
     .catch(error => console.log('error', error));
 
   } catch (err) {
@@ -68,15 +77,25 @@ router.post('/', async (req, res) => {
     console.log({ message: err });
   }
 });
-
-
-
 //---------------------------------------
 //END of routeer activity
 //---------------------------------------
 module.exports = router;
 
-
+async function saveImage(url,image_path){
+        axios({
+          url,
+          responseType: 'stream',
+        }).then(
+          response =>
+            new Promise((resolve, reject) => {
+              response.data
+                .pipe(fs.createWriteStream(image_path))
+                .on('finish', () => resolve())
+                .on('error', e => reject(e));
+            }),
+        );
+}
 
 
 

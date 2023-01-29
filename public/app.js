@@ -37,21 +37,32 @@ function getUserName() {
     );
 }
 async function importAndGenerateCard() {
-    const { generateCard  } = await import('./generateCard.js');
+    const { generateCard } = await import('./generateCard.js');
     const { createCardStats, getCardName } = await import('./getCardName.js');
 
     let cardName = await getCardName(); // generates the card name
     let stats = createCardStats(); // generates the stats and returns them in a json object
 
     let cardCastCost = stats.castingCost;
-    let cardArt = stats.cardArt;
     let cardAttack = stats.attack;
-    let cardDef= stats.defense;
-    let cardHealth =stats.health;
-    let cardDeathDam = stats.deathDamage ;
+    let cardDef = stats.defense;
+    let cardHealth = stats.health;
+    let cardDeathDam = stats.deathDamage;
+    
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
-    console.log(typeof(cardName));
-    console.log(cardName);
+    var raw = JSON.stringify({
+        "name": cardName
+    });
+
+    let cardArt = await fetch("https://swampix.devdylan.us/createCard/createArt", {  method: 'POST',  headers: myHeaders, body: raw, redirect: 'follow' })
+        .then(response => response.text())
+        .then(result => {
+            console.log(result)
+            return result
+        })
+        .catch(error => console.log('error', error));
 
     return generateCard(cardCastCost, cardArt, cardName, cardAttack, cardDef, cardHealth, cardDeathDam);
 }

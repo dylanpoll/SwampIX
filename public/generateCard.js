@@ -1,14 +1,43 @@
 // cardCastCost='2', cardArt='potardTheMenace.jpg', cardName='Potard the menace - flying Devil', cardAttack='3', cardDef='2', cardHealth='2', cardDeathDam='4'
 
-function generateCard(cardCastCost, cardArt, cardName, cardAttack, cardDef, cardHealth, cardDeathDam) {
+async function checkImageLink(image_path) {
+    var e = new Date().getTime() + (3 * 1000);
+    while (new Date().getTime() <= e) {}
+    
+    let respond = await fetch(image_path, {
+        "method": "GET",
+    })     
+    .then(response => response.text())
+    .then(result => {
+      console.log(result);
+      return result
+    })
+    .catch(error => console.log('error', error));
+    return respond // returns the cards name
+}
+
+async function generateCard(cardCastCost, cardArt, cardName, cardAttack, cardDef, cardHealth, cardDeathDam) {
     // const playingCard = document.createElement('div');
     const playingCard = document.createElement('button');
     playingCard.setAttribute('type', 'button');
     playingCard.setAttribute('onclick', 'getUserName()');
     playingCard.setAttribute('style', `background: transparent; border: none !important; font-size:0;`);
+    console.log(`cardArt link is : ${cardArt}`);
+    const stringCardArt = String.raw`${cardArt}`;
+
+
+    let temp_image_path = 'https://swampix.devdylan.us/resources/cardArt/'+cardName.replaceAll(' ','_');
+    let image_path = temp_image_path.replaceAll('"','')+'.png';
+    
+    let respond = await checkImageLink(image_path);
+
+    console.log(`cardArt link is : ${image_path}`);
+
+    // <div class="cardAvatar" style="background-image:url('${cardArt}');"/>
+    // <img src="${cardArt}" class="cardAvatar"/>
     playingCard.innerHTML = `
         <div class="cardContainer">
-            <div class="cardAvatar" style="background-image:url('./resources/cardArt/${cardArt}');"/>
+        <div class="cardAvatar" style="background-image:url('`+image_path+`');"/>
             <div class="cardBase"/>
             <div class="container">
                 <table class="cardTextStuff">
@@ -28,7 +57,7 @@ function generateCard(cardCastCost, cardArt, cardName, cardAttack, cardDef, card
             </div>
         </div>
 `;
-    // console.log(playingCard);
+    console.log(playingCard);
     // document.body.appendChild(playingCard);
     document.getElementById("cardTable").appendChild(playingCard);
     // alert(playingCard)

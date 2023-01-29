@@ -1,49 +1,15 @@
-
-
 async function getCardName() {
     let name = await fetch("https://swampix.devdylan.us/createCard/name", {
-        "headers": {
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
-        },
         "method": "GET",
-        "mode": "cors"
+    })     
+    .then(response => response.text())
+    .then(result => {
+      console.log(result);
+      return result
     })
-    .then(response => { 
-        return response;
-    })
-    
-    // var myHeaders = new Headers();
-    // myHeaders.append("Content-Type", "application/json");
-    
-    // var raw = JSON.stringify({
-    //   "name": "Lemon the Seller of Butter - the fake"
-    // });
-    
-    // var requestOptions = {
-    //   method: 'GET',
-    //   headers: myHeaders,
-    //   body: raw,
-    //   redirect: 'follow'
-    // };
-    
-    // var name = await fetch("https://swampix.devdylan.us/createCard/name", requestOptions)
-    //   .then(response => response.text())
-    //   .then(result => {
-    //     console.log(result);
-    //     return result
-    //   })
-    //   .catch(error => console.log('error', error));
+    .catch(error => console.log('error', error));
 
-      return name
-    //https://swampix.devdylan.us/createCard/cardArt
-    // fetch("/", {
-    //     method: 'GET',
-    // })
-    
-    
-    // .then(result => res.json(result)) 
-    // .catch(error => console.log('error', error));
-
+    return name // returns the cards name
 }
 
 
