@@ -3,10 +3,41 @@ const router = express.Router();
 const fetch = require('node-fetch');
 const bearerToken = process.env.OPENAI_API_KEY;
 
+const descriptors = ["the ugly", "the fair", "the terrible", "the unreasonable", "the fake", "the twit", "the big dumb", "the honorable", "the formidable", "the little"];
+const nameEndpoints =["https://monsternames-api.com/api/v1.0/goatmen",
+    "https://monsternames-api.com/api/v1.0/goblin",
+    "https://monsternames-api.com/api/v1.0/ogre",
+    "https://monsternames-api.com/api/v1.0/orc",
+    "https://monsternames-api.com/api/v1.0/skeleton",
+    "https://monsternames-api.com/api/v1.0/troll"]
+
+router.get('/name', async (req, res) => {
+
+    //Generate random name using name generator api
+    //Take first and last name and combine with a descriptor that is randomly chosen
+    //Possible descriptors: [the ugly, the fair, the terrible, the unreasonable, the fake, the twit, the big dumb, the honorable, the formidable]
+    //Make an api call to generate card image    
+    
+    let randEndpoint = nameEndpoints[Math.floor(Math.random() * nameEndpoints.length)];
+    let randDescriptor = descriptors[Math.floor(Math.random() * descriptors.length)];
+
+    fetch(randEndpoint, {
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(response => { 
+      let name = response.fullName + " " + randDescriptor
+      return name;
+    })
+    .then(result => res.json(result)) 
+    .catch(error => console.log('error', error));
+}),
+
 router.post('/', async (req, res) => {
   try {
+
     console.log(req.body);
-    let stringToGenerateImageWith = JSON.stringify(req.body.stringToGenerateImageWith); 
+    let stringToGenerateImageWith = req.body.name;
     var raw = JSON.stringify({
       // "prompt": "A rogue-like card game logo", //TODO: get this info from user
       "prompt": stringToGenerateImageWith, //TODO: get this info from user
@@ -14,7 +45,7 @@ router.post('/', async (req, res) => {
       "size": "256x256"
     });
     //console.log(req.body);//uncomment to echo recieved JSON body in terminal
-    // let subroute = "/";
+    // let subroute = "/cardart";
     fetch("https://api.openai.com/v1/images/generations", {
       method: 'POST',
       headers: { 

@@ -35,12 +35,12 @@
     z-index: 10;
 }
 
-.card-personnage,
+.card-personnage, 
 .card-monstre1,
 .card-monstre2,
 .card-monstre3,
 .card-monstre4 {
-    background-image: url("./cardFrame.png");
+    background-image: url("../cardbody/cardFrame.png");
 }
 
 .card-equipement,
@@ -49,7 +49,7 @@
 .card-piege,
 .card-instant,
 .card-evenement {
-    background-image: url("./cardFrame2.png");
+    background-image: url("../cardbody/cardFrame2.png");
 }
 
 .card-level-cost {
@@ -68,7 +68,7 @@
 .cost-personnage {
     padding-top: 6px;
     font-size: 15px;
-    background-image: url('./icons/eolic-energy-svgrepo-com.svg');
+    background-image: url('../icons/eolic-energy-svgrepo-com.svg');
 }
 .cost-equipement,
 .cost-bonus,
@@ -79,7 +79,7 @@
     padding-top: 10px;
     padding-left: 5px;
     font-size: 13px;
-    background-image: url('./icons/beer-stein.svg');
+    background-image: url('../icons/beer-stein.svg');
 }
 
 .avatar {

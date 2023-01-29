@@ -1,0 +1,135 @@
+@font-face {
+    font-family: 'viking';
+    src: url("../fonts/Viking-Normal.otf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'norse';
+    src: url("../fonts/Norse.otf");
+    font-weight: normal;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'norse';
+    src: url("../fonts/Norse-Bold.otf");
+    font-weight: bold;
+    font-style: normal;
+}
+
+.cardContainer{
+    position: absolute;
+    display: flex;
+    width: 63mm;
+    height: 80mm;
+    border: 3px solid #73AD21;
+    /* overflow: auto; */
+}
+
+.cardAvatar {
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    max-width: 48mm;
+    max-height: 50mm;
+    background-size: contain;
+    background-repeat: no-repeat;
+    /* margin-left: 22px; */
+    /* margin-top: 30px; */
+    /* background-position: center; */
+    /* margin-left: -10px; */
+    /* background-size: cover; */
+    /* z-index: 0; */
+}
+.cardBase {
+    position: absolute;
+    top: 0px;
+    /* text-align: center; */
+    /* color: rgb(0, 0, 0); */
+    background-image: url("../cardbody/cardTemplate.png");
+    background-repeat: no-repeat;
+    background-size: contain; 
+    width: 63mm;
+    height: 80mm;
+    z-index: 10;
+}
+.cardAttckAbsoluteTextPosition {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 13mm;
+    left: 18mm;
+  }
+.cardDeffenceAbsoluteTextPosition {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 13mm;
+    left: 28mm;
+  }
+.cardHealthAbsoluteTextPosition {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 13mm;
+    left: 38mm;
+  }
+.cardDeathDamAbsoluteTextPosition {
+    font-size: 8pt;
+    position: absolute;
+    bottom: 13mm;
+    left: 48mm;
+  }
+.cardLevelCost {
+    position: absolute;
+    font-family: 'viking';
+    width: 30px;
+    height: 30px;
+    right: 7mm;
+    top: 4mm;
+    color: coral;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    text-align: center;
+    background-repeat: no-repeat;
+    /*font-weight: bold;*/
+}
+
+.cardName {
+    position: absolute;
+    bottom: 20mm;
+    left: 5mm;
+    font-family: 'norse';
+    font-weight: bold;
+    font-size: 9pt; 
+    /*float: left;*/
+    /* margin-top: 160px;
+    margin-left: 5mm; */
+    /* width: 60mm;
+    height: 5mm; */
+    /* padding: 3px 0; */
+}
+
+.cardTextStuff {
+    font-family: 'viking';
+    font-weight: bold;
+    font-size: 10pt;
+    width: 100%;
+    padding: 0 10%;
+    text-align: center;
+    margin: 3px 0;
+}
+
+.cardDescription {
+    position: absolute;
+    bottom: 9mm;
+    left: 10mm;
+    font-family: "Helvetica";
+    font-size: 7pt;
+    font-style: italic;
+    /* margin: 0; */
+    /* text-align: center; */
+    /* width: 80%;
+    height: 38%; */
+    /* padding: 0 10%; */
+    /* display: flex;
+    align-items: center;
+    justify-content: center; */
+}
