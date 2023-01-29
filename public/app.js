@@ -36,10 +36,26 @@ function getUserName() {
         }
     );
 }
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+  }
+function createTD(row){
+    const tableRow = document.createElement('td');
+    tableRow.setAttribute('id', 'row'+row);
+    tableRow.setAttribute('class', 'cardTable');
+    tableRow.innerHTML = `
+    `;
+    document.getElementById("mainCardTable").appendChild(tableRow);
+    return 'row'+row;
+}
 async function importAndGenerateCard() {
     const { generateCard } = await import('./generateCard.js');
     const { createCardStats, getCardName } = await import('./getCardName.js');
-
+    // let row = getRandomInt(50);
+    // let td = createTD(row);
+    for (let i = 0; i <= 4; i++) {
+        
+      
     let cardName = await getCardName(); // generates the card name
     let stats = createCardStats(); // generates the stats and returns them in a json object
 
@@ -64,7 +80,9 @@ async function importAndGenerateCard() {
         })
         .catch(error => console.log('error', error));
 
-    return generateCard(cardCastCost, cardArt, cardName, cardAttack, cardDef, cardHealth, cardDeathDam);
+    generateCard(cardCastCost, cardArt, cardName, cardAttack, cardDef, cardHealth, cardDeathDam);
+    } 
+    return
 }
 
 function main() {

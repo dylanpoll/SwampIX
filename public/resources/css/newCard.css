@@ -16,7 +16,10 @@
     font-weight: bold;
     font-style: normal;
 }
-
+.bufferContainer{
+    display: flex;
+    justify-content: start;
+}
 .cardContainer{
     position: absolute;
     display: flex;
