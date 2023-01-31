@@ -25,6 +25,7 @@ async function getClientConstVars() {
     window.DATABASEID = getDATABASEID;
     window.COLLECTIONID = getCOLLECTIONID;
 }
+
 function getUserName() {
     let promise = account.get();
     promise.then(
@@ -36,9 +37,11 @@ function getUserName() {
         }
     );
 }
+
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
+
 function createTable() {
     let row = getRandomInt(50);
     const tableRow = document.createElement('table');
@@ -52,7 +55,6 @@ function createTable() {
     document.getElementById("uploader").appendChild(tableRow);
     return 'mainCardTableid' + row;
 }
-
 
 async function saveCardToCardCollection(cardCastCost, image_path, cardName, cardAttack, cardDef, cardHealth, cardDeathDam){
     let documentID = getRandomInt(50000);
@@ -137,8 +139,6 @@ async function importAndGenerateCard() {
     return
 }
 
-
-
 function main() {
     window.client = new Appwrite.Client();// Before we start doing anything, we need to init our Appwrite Web SDK
 
@@ -172,7 +172,6 @@ function main() {
         console.log(response)
     });
 }
-
 
 async function getDatabaseDocuments() {
     var myHeaders = new Headers();
@@ -231,8 +230,8 @@ function isLogged() {
             <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="getUserName()"> Get User Name </button>
     
             <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="deleteCurrentSession()"> Logout </button>
-
-            <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="displayPriorGeneratedCards()"> get Prior Generated Cards </button>
+            
+            <button type="button" class="btn btn-primary btn-lg mr-4 mb-4" onclick="location.href='https://swampix.devdylan.us/allCards.html'"> get Prior Generated Cards </button>
         `;
         },
         function (error) {
@@ -274,7 +273,6 @@ function createJWT() {
         }
     );
 }
-
 
 async function displayPriorGeneratedCards() {
     const { generateCard } = await import('./displayStoredCards.js');
