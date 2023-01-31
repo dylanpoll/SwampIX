@@ -27,8 +27,8 @@
                     d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
                 </path>
             </svg> &nbsp;ROGLE Github Repo</a>
-        <a class="navbar-brand" href="https://swampix.devdylan.us/"> <img src="./resources/logos/Rogle.png"
-                height="32" aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32">&nbsp; Back To The ROGLE Home Page</a>
+        <a class="navbar-brand" href="https://swampix.devdylan.us/"> <img src="./resources/logos/Rogle.png" height="32"
+                aria-hidden="true" viewBox="0 0 16 16" version="1.1" width="32">&nbsp; Back To The ROGLE Home Page</a>
     </nav>
     <script>
         // https://swampix.devdylan.us/singleCard.html/?cardCastCost=4&cardName=Ow_the_formidable&cardAttack=5&cardDef=3&cardHealth=8&cardDeathDam=3
@@ -113,10 +113,10 @@
                     var leftIterate = 0;
                     var fiveCounter = 1;
                     for (var cards = 1; cards <= cardTotal; cards++) {
-                        try{
+                        try {
                             var topSpacing = displayDivider * 303;
                             var leftSpacing = leftIterate * 223;
-                            if (fiveCounter==1) { leftSpacing = 0 };
+                            if (fiveCounter == 1) { leftSpacing = 0 };
                             // if (displayDivider == 1) { topSpacing = 0 };
                             var card = result.documents[cards];
                             var cardCastCost = card.castingCost;
@@ -128,23 +128,42 @@
                             var cardDeathDam = card.deathDamage;
                             // console.log(cards, cardCastCost, image_path, cardName, cardAttack, cardDef, cardHealth, cardDeathDam, topSpacing, leftSpacing);
                             generateCard(cardCastCost, image_path, cardName, cardAttack, cardDef, cardHealth, cardDeathDam, topSpacing, leftSpacing);
-                            if(fiveCounter==5){
+
+                            // attempt below to lazily export all cards into images to add to table top sim....
+                            // var raw = JSON.stringify({
+                            //     "cardCastCost": cardCastCost,
+                            //     "cardName": cardName,
+                            //     "cardAttack": cardAttack,
+                            //     "cardDef": cardDef,
+                            //     "cardHealth": cardHealth,
+                            //     "cardDeathDam": cardDeathDam
+                            // });
+                            // var requestOptions = {
+                            //     method: 'POST',
+                            //     headers: myHeaders,
+                            //     body: raw,
+                            //     redirect: 'follow'
+                            // };
+                            // fetch("https://swampix.devdylan.us/createCard/makecardjpg", requestOptions)
+                            //     .then(response => response.text())
+                            //     .then(result => console.log(result))
+                            //     .catch(error => console.log('error', error));
+                            
+                            if (fiveCounter == 5) {
                                 // console.log("hit counter")
                                 displayDivider = displayDivider + 1;
                                 leftIterate = 0;
                                 fiveCounter = 1;
                             }
-                            else{
+                            else {
                                 // console.log("incrimented");
                                 leftIterate = leftIterate + 1;
                                 fiveCounter = fiveCounter + 1;
                             }
-                            }catch{
-                                console.log("failed to get card " + cardName)
-                            }
+                        } catch {
+                            console.log("failed to get card " + cardName)
+                        }
                     }
-                    // alert("Current cards stored in DB = " + cardTotal + " | Currently all cards can be viewed by using the https://appwrite.devdylan.us/v1/databases/63d3a613604eb2cde313/collections/63d3a61a70dec437bfaf/documents api endpoint with a get request, however rendering them is proving to be a bit tricky. open dev tools in browser to see the json bodies for the 5 rendered currently!");
-                    // return response
                 })
                 .catch(error => console.log('error', error));
         }

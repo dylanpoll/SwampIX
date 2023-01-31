@@ -4,36 +4,56 @@ const fetch = require('node-fetch');
 const bearerToken = process.env.OPENAI_API_KEY;
 const fs = require('fs');
 const axios = require('axios');
+// const nodeHtmlToImage = require('node-html-to-image')
+const puppeteer = require('puppeteer');
+// const browser = await puppeteer.launch()
 
 const descriptors = ["the ugly", "the fair", "the terrible", "the unreasonable", "the fake", "the twit", "the big dumb", "the honorable", "the formidable", "the little"];
-const nameEndpoints =["https://monsternames-api.com/api/v1.0/goatmen",
-    "https://monsternames-api.com/api/v1.0/goblin",
-    "https://monsternames-api.com/api/v1.0/ogre",
-    "https://monsternames-api.com/api/v1.0/orc",
-    "https://monsternames-api.com/api/v1.0/skeleton",
-    "https://monsternames-api.com/api/v1.0/troll"]
+const nameEndpoints = ["https://monsternames-api.com/api/v1.0/goatmen",
+  "https://monsternames-api.com/api/v1.0/goblin",
+  "https://monsternames-api.com/api/v1.0/ogre",
+  "https://monsternames-api.com/api/v1.0/orc",
+  "https://monsternames-api.com/api/v1.0/skeleton",
+  "https://monsternames-api.com/api/v1.0/troll"]
 
 router.get('/name', async (req, res) => {
 
-    //Generate random name using name generator api
-    //Take first and last name and combine with a descriptor that is randomly chosen
-    //Possible descriptors: [the ugly, the fair, the terrible, the unreasonable, the fake, the twit, the big dumb, the honorable, the formidable]
-    //Make an api call to generate card image    
-    
-    let randEndpoint = nameEndpoints[Math.floor(Math.random() * nameEndpoints.length)];
-    let randDescriptor = descriptors[Math.floor(Math.random() * descriptors.length)];
+  //Generate random name using name generator api
+  //Take first and last name and combine with a descriptor that is randomly chosen
+  //Possible descriptors: [the ugly, the fair, the terrible, the unreasonable, the fake, the twit, the big dumb, the honorable, the formidable]
+  //Make an api call to generate card image    
 
-    fetch(randEndpoint, {
-      method: 'GET',
-    })
+  let randEndpoint = nameEndpoints[Math.floor(Math.random() * nameEndpoints.length)];
+  let randDescriptor = descriptors[Math.floor(Math.random() * descriptors.length)];
+
+  fetch(randEndpoint, {
+    method: 'GET',
+  })
     .then(response => response.json())
-    .then(response => { 
+    .then(response => {
       let name = response.fullName + " " + randDescriptor
       return name;
     })
-    .then(result => res.json(result)) 
+    .then(result => res.json(result))
     .catch(error => console.log('error', error));
-}),
+});
+
+router.post('/makecardjpg', async (req, res) => {
+  // https://swampix.devdylan.us/individualCard.html?cardCastCost=4&cardName=Ow_the_formidable&cardAttack=5&cardDef=3&cardHealth=8&cardDeathDam=3
+  url = 'https://swampix.devdylan.us/individualCard.html?cardCastCost='+req.body.cardCastCost+'&cardName='+req.body.cardName+'&cardAttack='+req.body.cardAttack+'&cardDef='+ req.body.cardDef+'&cardHealth='+req.body.cardHealth +'&cardDeathDam='+req.body.cardDeathDam;
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setViewport({
+    width: 220,
+    height: 300,
+  });
+  await page.goto(url);
+  // await page.setContent(url);
+  await page.screenshot({ path: "./cardCaptureTest/"+req.body.cardName+".png" });
+  await browser.close();
+  console.log("completed making image of card.")
+  res.json({ message: "completed making image of card." });
+});
 
 router.post('/createArt', async (req, res) => {
   try {
@@ -50,27 +70,27 @@ router.post('/createArt', async (req, res) => {
     // let subroute = "/cardart";
     fetch("https://api.openai.com/v1/images/generations", {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json', 
-        'Authorization': 'Bearer ' + bearerToken 
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + bearerToken
       },
       body: raw,
       // body: JSON.stringify(req.body), // this could be used to instead use whatever body we send this endpoint directly.
       redirect: 'follow'
     })
-    .then(response => response.json()) // we could pull text etc but json is best.
-    .then(response => { 
-      return response.data[0].url; //get the url out of the json response body
-    })
-    .then(result => {
-      return new Promise(async (resolve, reject) => {
-        let url = result;
-        let image_path = './public/resources/cardArt/'+stringToGenerateImageWith.replaceAll(' ','_')+'.png';
-        await saveImage(url,image_path.replaceAll('"',''));
-        res.json(stringToGenerateImageWith+'.png');
+      .then(response => response.json()) // we could pull text etc but json is best.
+      .then(response => {
+        return response.data[0].url; //get the url out of the json response body
       })
-    }) // this res.json() is what is sent back to the requesting client. anything used by res. would do that.
-    .catch(error => console.log('error', error));
+      .then(result => {
+        return new Promise(async (resolve, reject) => {
+          let url = result;
+          let image_path = './public/resources/cardArt/' + stringToGenerateImageWith.replaceAll(' ', '_') + '.png';
+          await saveImage(url, image_path.replaceAll('"', ''));
+          res.json(stringToGenerateImageWith + '.png');
+        })
+      }) // this res.json() is what is sent back to the requesting client. anything used by res. would do that.
+      .catch(error => console.log('error', error));
 
   } catch (err) {
     res.json({ message: "an error occured while getting card art." });
@@ -82,19 +102,19 @@ router.post('/createArt', async (req, res) => {
 //---------------------------------------
 module.exports = router;
 
-async function saveImage(url,image_path){
-        axios({
-          url,
-          responseType: 'stream',
-        }).then(
-          response =>
-            new Promise((resolve, reject) => {
-              response.data
-                .pipe(fs.createWriteStream(image_path))
-                .on('finish', () => resolve())
-                .on('error', e => reject(e));
-            }),
-        );
+async function saveImage(url, image_path) {
+  axios({
+    url,
+    responseType: 'stream',
+  }).then(
+    response =>
+      new Promise((resolve, reject) => {
+        response.data
+          .pipe(fs.createWriteStream(image_path))
+          .on('finish', () => resolve())
+          .on('error', e => reject(e));
+      }),
+  );
 }
 
 

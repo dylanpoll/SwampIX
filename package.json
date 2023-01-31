@@ -11,8 +11,11 @@
     "appwrite": "^8.0.1",
     "axios": "^1.2.6",
     "cors": "^2.8.5",
+    "dom-to-image": "^2.6.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
-    "node-appwrite": "5.1.0"
+    "node-appwrite": "5.1.0",
+    "node-html-to-image": "^3.3.0",
+    "puppeteer": "^19.6.2"
   }
 }
