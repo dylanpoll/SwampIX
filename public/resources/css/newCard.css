@@ -17,6 +17,7 @@
     font-style: normal;
 }
 .bufferContainer{
+    padding: 100%;
     display: flex;
     justify-content: start;
 }

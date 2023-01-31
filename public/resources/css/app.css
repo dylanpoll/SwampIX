@@ -1,3 +1,9 @@
+.mainWrapper{
+        justify-content: flex-start;
+        width: 2000px;
+        height: 600px;
+        /* align-content: flex-start; */
+}
 .cardTable{
         /* justify-content: flex-start; */
         align-content: flex-start;
