@@ -37,8 +37,9 @@ class AppwriteManager():
 
     def getMinionCardDocuments(self):
       databases = Databases(self.CLIENT)
-      queries = 100
-      result = databases.list_documents(self.DATABASE_ID, self.MINION_COLLECTIONID, [ Query.equal('limit', '100') ] )
+      # queries = 100
+      # result = databases.list_documents(self.DATABASE_ID, self.MINION_COLLECTIONID, [ Query.equal('limit', '100') ] )
+      result = databases.list_documents(self.DATABASE_ID, self.MINION_COLLECTIONID)
       print("completed card action. \n")
       # print(str(result))
       return result
