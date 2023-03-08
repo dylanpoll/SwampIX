@@ -2,6 +2,7 @@ import os
 import json
 from pathlib import Path
 from dotenv import load_dotenv
+import time
 
 from flask import Flask, jsonify, request
 
@@ -49,6 +50,19 @@ def createMinion():
     payload = cardGenerationUtil.createMinion()
     response = appwriterUtil.createMinionCardDocument(payload)
     return response
+
+@app.route("/createDeck/<deckSize>" , methods = ['get'])
+def createDeck(deckSize):
+    # payload = request.get_json(silent=False) # silent means if it fails or not silently.
+    # if not payload: 
+    #     return { "Error" : " failed to pass a payload."}
+    data = []
+    response = {}
+    for i in range(int(deckSize)):
+        payload = cardGenerationUtil.createMinion()
+        data.append(payload)
+        response = appwriterUtil.createMinionCardDocument(payload)
+    return { "results" : str(data)}
 
 @app.route("/cleanCollection/<collectionID>" , methods = ['get'])
 def cleanCollection(collectionID):
