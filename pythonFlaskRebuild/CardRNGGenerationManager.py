@@ -8,7 +8,8 @@ from nameLists import NAME_PREFIXES,NAME_SUFFIXES,NAME_DECORATORS,WOMAN_NAMES,ME
 from dotenv import load_dotenv
 
 class CardRNGGenerationManager():
-    def __init__(self):
+    def __init__(self, log):
+      self.log = log
       self.DYLAN_OPENAI_API_KEY = str( os.getenv("DYLAN_OPENAI_API_KEY") )
       self.ORGANIZATION_ID_OPENAI = str( os.getenv("ORGANIZATION_ID_OPENAI") )
       self.HOST_URL = str( os.getenv("HOST_URL") )
@@ -64,20 +65,30 @@ class CardRNGGenerationManager():
           tempLastNamePortion = str(random.choice(UK_SURNAMES))
           resultingName = resultingName + tempNamePortion  + " "
       fullName = resultingName + str( random.choice(NAME_DECORATORS) )
-      print(fullName)
+      # self.log.info(fullName)
       return {"cardName": fullName, "race": selectedRace, "gender" : gender}
 
     def generateCardArt(self, prompt):
       cardArt = requests.request("POST", "https://api.openai.com/v1/images/generations", headers={ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + self.DYLAN_OPENAI_API_KEY } , data = json.dumps({ "prompt": str(prompt), "n": 1, "size": "256x256" }) ).json()
-      cardArtURL = str(cardArt['data'][0]['url'])
-      # print(cardArtURL)
-      return cardArtURL  # grabbing the url from the generation
+      try:
+        cardArtURL = str(cardArt['data'][0]['url'])
+        # self.log.info(cardArtURL)
+        return cardArtURL  # grabbing the url from the generation
+      except Exception as e:
+        self.log.error("\n================================================\nerror while attempting to produce card art. \nIOError :\n" + str(e.msg))
+        self.log.error("\n\nreturned json : \n" + str(cardArt) + "\n================================================\n")
+        return False
 
     def generateDescription(self, content):    
       description = requests.request("POST", "https://api.openai.com/v1/chat/completions", headers={ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + self.DYLAN_OPENAI_API_KEY } , data = json.dumps({ "model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": str(content) }]}) ).json()
-      returnedDescription = str(description['choices'][0]['message']['content'])
-      # print(returnedDescription)
-      return returnedDescription # grabbing the url from the generation
+      try:
+        returnedDescription = str(description['choices'][0]['message']['content'])
+        # self.log.info(returnedDescription)
+        return returnedDescription # grabbing the url from the generation
+      except Exception as e:
+        self.log.error("\n================================================\nerror while attempting to produce card art. \nIOError :\n" + str(e.msg) )
+        self.log.error("\n\nreturned json : \n" + str(description) + "\n================================================\n")
+        return False
 
     def createMinion(self):# payload will have the card attributes etc
       nameGenderAndRace = self.generateCardName()
@@ -103,18 +114,23 @@ class CardRNGGenerationManager():
                 "keyWords":  [str(random.choice(self.keyWords))],
                 "description": "" 
       }
-      descriptionContent = "Give me a short description for a fictional "  + str(cardAttributes["race"])[2:len(str(cardAttributes["race"]))-2] + " who identifies as a " + str(nameGenderAndRace['gender']) + " with " + str(cardAttributes["alignment"]) + " tendencies who's name is " + str(cardAttributes["cardName"])
-      # print(descriptionContent)
+      descriptionContent = "Give me a short description (it must be between 45 and 50 words) for a fictional ( race: "  + str(cardAttributes["race"])[2:len(str(cardAttributes["race"]))-2] + " ) who identifies as a " + str(nameGenderAndRace['gender']) + " with " + str(cardAttributes["alignment"]) + " tendencies who's name is " + str(cardAttributes["cardName"])
+      self.log.info("\n##################\nContent used to generate description : " + descriptionContent + " \n")
       cardAttributes["description"] = self.generateDescription(descriptionContent)
       # cardAttributes["cardArt"]  = self.generateCardArt( prompt = str(cardAttributes["description"]))
+      if cardAttributes["description"] == False:
+        return False
 
       prompt = "Generate fantasy art from the following prompt but inside a " + str(random.choice(ART_BACKGROUNDS)) + " . the prompt is : " + str(cardAttributes["description"])
-      print(prompt)
+      self.log.info("Art prompt : " + prompt)
       img_data = requests.get(self.generateCardArt( prompt = prompt)).content #locally saving the image... will update code to use locally stored image links as openAI deletes theirs.
+      if img_data == False:
+        return False
+
       cardArtFileSaveNAme = str(nameGenderAndRace['cardName']).replace(" ", "-") +'.png'
       savedFilePath = os.path.join("./cardArt/" + cardArtFileSaveNAme)
       cardAttributes["cardArt"]  = self.HOST_URL + "/cardArt/" + cardArtFileSaveNAme
-      # print("saving card image at : " + str(cardAttributes["cardArt"]))
+      # self.log.info("saving card image at : " + str(cardAttributes["cardArt"]))
       with open(savedFilePath, 'wb') as handler:
         handler.write(img_data)
 
@@ -122,7 +138,7 @@ class CardRNGGenerationManager():
       castingCostPossibleValues = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
       rarityWeights = [0.05, 0.2, 0.3, 0.2, 0.15, 0.15, 0.15, 0.1, 0.1, 0.05] #order aligns with casting values list and assigns probability for those casting values.
       castingCost = random.choices(population = castingCostPossibleValues, weights = rarityWeights) # for info on probability weights for options : https://docs.python.org/3.6/library/random.html#random.choices
-      # print(str(type(castingCost)) + str(castingCost))
+      # self.log.info(str(type(castingCost)) + str(castingCost))
       castingCost = int(str(castingCost)[1:-1])
       health = 1 # assigning 1 here and removing the required stat from the pool below.
       if castingCost == 0:
@@ -143,7 +159,7 @@ class CardRNGGenerationManager():
         incriminatedAttribute = str(random.choice(attributeList))
         cardAttributes[incriminatedAttribute] = int(cardAttributes[incriminatedAttribute]) + 1
         totalStatDistributionPool = totalStatDistributionPool -1
-      # print(str(cardAttributes))
+      # self.log.info(str(cardAttributes))
       return cardAttributes
 
     def createMonarch(self):# payload will have the card attributes etc
@@ -162,17 +178,32 @@ class CardRNGGenerationManager():
                 "keyWords":  [str(random.choice(self.keyWords))],
                 "description": "" 
       }
-      descriptionContent = "Give me a short description for a fictional "  + str(cardAttributes["race"])[2:len(str(cardAttributes["race"]))-2] + " who identifies as a " + str(nameGenderAndRace['gender']) + " with " + str(cardAttributes["alignment"]) + " tendencies who's name is " + str(cardAttributes["cardName"])
-      print(descriptionContent)
+      
+      descriptionContent = "Give me a short description (it must be between 45 and 50 words) for a fictional ( race: "  + str(cardAttributes["race"])[2:len(str(cardAttributes["race"]))-2] + " ) who identifies as a " + str(nameGenderAndRace['gender']) + " with " + str(cardAttributes["alignment"]) + " tendencies who's name is " + str(cardAttributes["cardName"])
+      self.log.info("\n##################\nContent used to generate description : " + descriptionContent + " \n")
       cardAttributes["description"] = self.generateDescription(descriptionContent)
+      if cardAttributes["description"] == False:
+        return False
+
+      prompt = "Generate fantasy art from the following prompt but inside a " + str(random.choice(ART_BACKGROUNDS)) + " . the prompt is : " + str(cardAttributes["description"])
+      self.log.info("Art prompt : " + prompt)
+      img_data = requests.get(self.generateCardArt( prompt = prompt)).content #locally saving the image... will update code to use locally stored image links as openAI deletes theirs.
+      if img_data == False:
+        return False
+        
+      cardArtFileSaveNAme = str(nameGenderAndRace['cardName']).replace(" ", "-") +'.png'
+      savedFilePath = os.path.join("./cardArt/" + cardArtFileSaveNAme)
+      cardAttributes["cardArt"]  = self.HOST_URL + "/cardArt/" + cardArtFileSaveNAme
+      with open(savedFilePath, 'wb') as handler:
+        handler.write(img_data)
       return cardAttributes
 
     
     
       # for name in range(len(self.nameEndpoints))
       #   result = databases.create_document(self.DATABASE_ID, self.MONARCH_COLLECTION_ID, documentID, data = payload )
-      #   print("completed card action. \n")
-      #   print(str(result))            
+      #   self.log.info("completed card action. \n")
+      #   self.log.info(str(result))            
       # nameAPIUsed = random.choice(self.nameEndpoints)
       # for name in self.nameEndpoints:
       #   cardName = requests.request("POST", styr(name), headers={ 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + DYLAN_OPENAI_API_KEY } , data = json.dumps({ "prompt": str( payload['cardName'] ), "n": 1, "size": "256x256" }) ).json()

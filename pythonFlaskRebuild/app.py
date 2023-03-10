@@ -3,15 +3,18 @@ import json
 from pathlib import Path
 from dotenv import load_dotenv
 import time
+import logging
 
 from flask import Flask, jsonify, request, send_from_directory
 
 from AppwriteManager import AppwriteManager
 from CardRNGGenerationManager import CardRNGGenerationManager
 
+logging.basicConfig(filename='/home/dylan/rogale/rogale/pythonFlaskRebuild/RogleRogaleFlaskLogs.log', level=logging.DEBUG)
+
 load_dotenv()
-appwriterUtil = AppwriteManager()
-cardGenerationUtil = CardRNGGenerationManager()
+appwriterUtil = AppwriteManager(log = logging)
+# cardGenerationUtil = CardRNGGenerationManager(log = logging)
 app = Flask(__name__)
 
 PORT = int( os.getenv("PORT") )
@@ -25,7 +28,7 @@ MONARCH_COLLECTION_ID = str( os.getenv("MONARCH_COLLECTION_ID") )
 def testEcho(uuid):
     content = request.get_json(silent=False) # silent means if it fails or not silently.
     response = str( uuid ) + " \n \n" + str( content )
-    print(content) # Do your processing
+    logging.info(content) # Do your processing
     return response
 
 @app.route("/getAllMinionCards" , methods = ['GET'])
@@ -40,7 +43,10 @@ def getAllMonarchCards():
 
 @app.route("/createMonarch" , methods = ['GET'])
 def createMonarch():
+    cardGenerationUtil = CardRNGGenerationManager(log = logging)
     payload = cardGenerationUtil.createMonarch()
+    if payload == False:
+        return { "error message" : "Failed to create card while communicating with chatGPT or openAI."}
     response = appwriterUtil.createMonarchCardDocument(payload)
     return response
 
@@ -48,12 +54,19 @@ def createMonarch():
 def statically_serveCardArt(path):
     return send_from_directory('cardArt', path)
 
+@app.route('/UE4/<path:path>')
+def RogelRogaleUE4(path):
+    return send_from_directory('RogelRogaleUE4.23', path)
+
 @app.route("/createMinion" , methods = ['get'])
 def createMinion():
     # payload = request.get_json(silent=False) # silent means if it fails or not silently.
     # if not payload: 
     #     return { "Error" : " failed to pass a payload."}
+    cardGenerationUtil = CardRNGGenerationManager(log = logging)
     payload = cardGenerationUtil.createMinion()
+    if payload == False:
+        return { "error message" : "Failed to create card while communicating with chatGPT or openAI."}
     response = appwriterUtil.createMinionCardDocument(payload)
     return response
 
@@ -65,6 +78,7 @@ def createDeck(deckSize):
     data = []
     response = {}
     for i in range(int(deckSize)):
+        cardGenerationUtil = CardRNGGenerationManager(log = logging)
         payload = cardGenerationUtil.createMinion()
         data.append({ "CardData" : payload })
         response = appwriterUtil.createMinionCardDocument(payload)
@@ -101,9 +115,9 @@ def fixCardArtFileNames():
     fileList = []
     path = "/home/dylan/rogale/rogale/pythonFlaskRebuild/cardArt/"
     scandir = os.scandir(path)
-    print("\n" + str(fileList) + "\n \n \n")
+    logging.info("\n" + str(fileList) + "\n \n \n")
     for individualFile in scandir:
-        print("updating filename : " + str(individualFile.name))
+        logging.info("updating filename : " + str(individualFile.name))
         originalFileNeme = str(individualFile.name)
         newName = originalFileNeme[0:len(originalFileNeme)-4]
         # newName = ''.join([i for i in originalFileNeme if not i.isdigit()])
@@ -120,7 +134,7 @@ if __name__ == '__main__':
 # @app.route('/api/add_message/<uuid>', methods=['GET', 'POST'])  # https://stackoverflow.com/questions/20001229/how-to-get-posted-json-in-flask
 # def add_message(uuid):
 #     content = request.get_json(silent=True)
-#     # print(content) # Do your processing
+#     # logging.info(content) # Do your processing
 #     return uuid
 
     
