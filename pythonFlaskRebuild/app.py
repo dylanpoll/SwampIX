@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import time
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 
 from AppwriteManager import AppwriteManager
 from CardRNGGenerationManager import CardRNGGenerationManager
@@ -18,6 +18,8 @@ PORT = int( os.getenv("PORT") )
 HOST = str( os.getenv("HOST") )
 DYLAN_OPENAI_API_KEY = str( os.getenv("DYLAN_OPENAI_API_KEY") )
 ORGANIZATION_ID_OPENAI = str( os.getenv("ORGANIZATION_ID_OPENAI") )
+MINION_COLLECTIONID = str( os.getenv("MINION_COLLECTION_ID") )
+MONARCH_COLLECTION_ID = str( os.getenv("MONARCH_COLLECTION_ID") )
 
 @app.route('/test/<uuid>', methods=['POST'])  # EXAMPLE CODE https://stackoverflow.com/questions/43218413/get-data-json-in-flask
 def testEcho(uuid):
@@ -26,10 +28,14 @@ def testEcho(uuid):
     print(content) # Do your processing
     return response
 
-
 @app.route("/getAllMinionCards" , methods = ['GET'])
 def getAllMinionCards():
-    response = appwriterUtil.getMinionCardDocuments()
+    response = appwriterUtil.getAllCardData(MINION_COLLECTIONID)
+    return response
+
+@app.route("/getAllMonarchCards" , methods = ['GET'])
+def getAllMonarchCards():
+    response = appwriterUtil.getAllMonarchCardData(MONARCH_COLLECTION_ID)
     return response
 
 @app.route("/createMonarch" , methods = ['GET'])
@@ -38,9 +44,9 @@ def createMonarch():
     response = appwriterUtil.createMonarchCardDocument(payload)
     return response
 
-# @app.route("/getMonarch")
-# def hello_world():
-#     return "<p>Hello, World!</p>"
+@app.route('/cardArt/<path:path>')
+def statically_serveCardArt(path):
+    return send_from_directory('cardArt', path)
 
 @app.route("/createMinion" , methods = ['get'])
 def createMinion():
@@ -60,9 +66,9 @@ def createDeck(deckSize):
     response = {}
     for i in range(int(deckSize)):
         payload = cardGenerationUtil.createMinion()
-        data.append(payload)
+        data.append({ "CardData" : payload })
         response = appwriterUtil.createMinionCardDocument(payload)
-    return { "results" : str(data)}
+    return { "results" : data }
 
 @app.route("/cleanCollection/<collectionID>" , methods = ['get'])
 def cleanCollection(collectionID):
@@ -70,11 +76,41 @@ def cleanCollection(collectionID):
     response = appwriterUtil.cleanResetCollectionDocuments(collectionID)
     return response
 
-# @app.route("/getMinion")
-# def hello_world():
-#     return "<p>Hello, World!</p>"
+@app.route("/deleteSingleCardByCollectionAndDocID/<collectionID>/<documentID>" , methods = ['get'])
+def deleteSingleCardByCollectionAndDocID(collectionID,documentID):
+    collectionID = str(collectionID)
+    response = appwriterUtil.deleteSingleCardByCollectionAndDocID(collectionID, documentID)
+    return response
 
+@app.route("/updateCardArtURLForAllCards/<collectionID>", methods = ['get'])
+def updateCardArtURLForAllCards(collectionID):
+    collectionID = str(collectionID)
+    urlList =  appwriterUtil.updateCardArtURLAttributes(collectionID)
+    return { "urlList" : urlList }
 
+@app.route("/getAllCardArtURLs/<collectionID>", methods = ['get'])
+def getAllCardArtURLs(collectionID):
+    collectionID = str(collectionID)
+    urlList =  appwriterUtil.getAllCardArtURLAttributes(collectionID)
+    return { "urlList" : urlList }
+
+# @app.route("/fixFileNames/<pathToDir>", methods = ['get'])
+# def fixCardArtFileNames(pathToDir):
+@app.route("/fixFileNames", methods = ['get'])
+def fixCardArtFileNames():
+    fileList = []
+    path = "/home/dylan/rogale/rogale/pythonFlaskRebuild/cardArt/"
+    scandir = os.scandir(path)
+    print("\n" + str(fileList) + "\n \n \n")
+    for individualFile in scandir:
+        print("updating filename : " + str(individualFile.name))
+        originalFileNeme = str(individualFile.name)
+        newName = originalFileNeme[0:len(originalFileNeme)-4]
+        # newName = ''.join([i for i in originalFileNeme if not i.isdigit()])
+        # newName = newName.replace(" ", "-") +'.png'
+        os.rename(path + originalFileNeme, path + newName)
+        fileList.append({ str(originalFileNeme) : str(newName)})
+    return { "files changed" : fileList }
 if __name__ == '__main__':
     app.run(host=HOST, port=PORT, debug=True)
 

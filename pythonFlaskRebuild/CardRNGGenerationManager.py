@@ -3,35 +3,15 @@ import json
 import random
 import os
 import json
-from nameLists import NAME_PREFIXES,NAME_SUFFIXES,NAME_DECORATORS,WOMAN_NAMES,MENS_NAMES,UK_SURNAMES
+from nameLists import NAME_PREFIXES,NAME_SUFFIXES,NAME_DECORATORS,WOMAN_NAMES,MENS_NAMES,UK_SURNAMES, RACES, ART_BACKGROUNDS
+
+from dotenv import load_dotenv
 
 class CardRNGGenerationManager():
     def __init__(self):
       self.DYLAN_OPENAI_API_KEY = str( os.getenv("DYLAN_OPENAI_API_KEY") )
       self.ORGANIZATION_ID_OPENAI = str( os.getenv("ORGANIZATION_ID_OPENAI") )
-      self.nameEndpoints = [
-          "https://monsternames-api.com/api/v1.0/goatmen",
-          "https://monsternames-api.com/api/v1.0/goblin",
-          "https://monsternames-api.com/api/v1.0/ogre",
-          "https://monsternames-api.com/api/v1.0/orc",
-          "https://monsternames-api.com/api/v1.0/skeleton",
-          "https://monsternames-api.com/api/v1.0/troll"
-          ]
-      self.races = [
-          "Goatmen","Skeleton","Swarm of Poisonous Snakes","Sylph","Giant Vulture","Brownie","Flying Sword","Sasquatch","Demon","Goblin","Dryad","Hippogriff","Faun","Blood Hawk","Giant Constrictor Snake","Kobold","Wight","Giant Frog","Roc","Hobgoblin","Homonculus","Wraith","Twig Blight","Gremlin","Siren","Dryad","Harpy","Stirge","Frost Giant","Slug","Kobold","Giant Poisonous Snake","Cyclops","Wendigo","Pixie","Chupacabra","Geiffon","Thunderbird","Fresh Golem","Young Green Dragon","Alien","Giant Weasel","Swarm of Bats","Plesiosaurus","Phoenix","Vampire","Succubus","Elemental","Giant Scorpion","Minotaur","Nothic","Yeti","Naga","Valkyrie","Mummy","Panther","Fire Elemental","Lich","Allosaurus","Kappa","Fairy","Hill Giant","Swarm of Ravens","Troll","Jackal","Tiger","Werewolf","Chimera","Spider","Wyvern","Draugr","Golem","Lamassu","Unicorn","Spectre","Centaur","Leprechaun","Quipper","Giant Crocodile","Satyr","Giant Wasp","Witch","Nix","Fire Giant","Mastiff","Incubus","Pegasus","Manticore","Giant Toad","Merman","Elk","Ogre","Swarm of Rats","Zombie","Grick","Dragon","Gnome","Giant Spider","Imp","Merfolk","Nymph","Bugbear","Octopus","Cyclops","Hydra","Oni","Poltergeist","Djinn","Elf","Adult Red Dragon","Kraken","Gorgon","Deeth Dog","Deer","Dwarf","Mermaid","Selkie","Giant Lizard","Orc","Warg","Hag","Giant Boar"
-          ]
-      self.descriptors = [
-          "the ugly", 
-          "the fare", 
-          "the terrible", 
-          "the unreasonable", 
-          "the fake", 
-          "the twit", 
-          "the big dumb", 
-          "the honorable", 
-          "the formidable", 
-          "the little"
-          ]
+      self.HOST_URL = str( os.getenv("HOST_URL") )
       self.status = [
             "Flying", "Stealth", "Basic"
           ]
@@ -53,6 +33,7 @@ class CardRNGGenerationManager():
       self.gender = [
         "Woman","Man","Gender-Fluid"
       ]
+      self.races = RACES
       self.name_prefixes = NAME_PREFIXES,
       self.name_suffixes = NAME_SUFFIXES
       self.name_decorators = NAME_DECORATORS
@@ -61,8 +42,6 @@ class CardRNGGenerationManager():
       self.uk_surnames = UK_SURNAMES
 
     def generateCardName(self):# payload will have the card attributes etc
-      # localNameOptionsList = self.nameEndpoints
-      # localRaceOptionsList = self.races
       localNameOptionsList = []
       selectedRace = str(random.choice(self.races))
       gender = str(random.choice(self.gender)) # used to pick names that make sense.
@@ -75,40 +54,15 @@ class CardRNGGenerationManager():
 
       totalNameItems = int( random.randint( 1, 4 ))
       resultingName = ''
-      # selectedRace = ''
-      # selectedNameAPIList = []
 
       for nameChoise in range(0,totalNameItems):
         if nameChoise != totalNameItems:
-          # nameAPIUsed = str(random.choice(localNameOptionsList))
-          # listIndex = int(localNameOptionsList.index(nameAPIUsed))
-          # selectedRace = str(localRaceOptionsList[listIndex])
-          # selectedNameAPIList.append(nameAPIUsed)
-          # del localRaceOptionsList[listIndex]# removes options from pool
-          # del localNameOptionsList[listIndex] # removes options from pool
           tempNamePortion = str(random.choice(localNameOptionsList))
           resultingName = resultingName + tempNamePortion + " "
 
-        else: # if it == totalNameItems it is the last name so we get a last name
+        else: 
           tempLastNamePortion = str(random.choice(UK_SURNAMES))
           resultingName = resultingName + tempNamePortion  + " "
-          # nameAPIUsed = random.choice(localNameOptionsList)
-          # listIndex = int( localNameOptionsList.index( nameAPIUsed ) )
-          # selectedNameAPIList.append(nameAPIUsed)
-          # del localNameOptionsList[listIndex] # removes options from pool
-      # print(selectedRace)
-      # for selection in range(0,len(selectedNameAPIList)):
-      #   nameItem = requests.request("GET", str(selectedNameAPIList[selection]), headers={}, data={}).json()
-      #   # print(resultingName)   
-      #   if selection == 0:
-      #     resultingName = str( nameItem['firstName'] )     
-      #   # elif not nameItem['lastName']:
-      #   #   resultingName = resultingName  + " " + str( nameItem['firstName'] )
-      #   else:
-      #     resultingName = resultingName  + " " + str( nameItem['firstName'] )
-      #     # resultingName = resultingName  + " " + str( nameItem['lastName'] )
-
-      # fullName = resultingName + " " + str( random.choice(self.descriptors) )
       fullName = resultingName + str( random.choice(NAME_DECORATORS) )
       print(fullName)
       return {"cardName": fullName, "race": selectedRace, "gender" : gender}
@@ -150,13 +104,17 @@ class CardRNGGenerationManager():
                 "description": "" 
       }
       descriptionContent = "Give me a short description for a fictional "  + str(cardAttributes["race"])[2:len(str(cardAttributes["race"]))-2] + " who identifies as a " + str(nameGenderAndRace['gender']) + " with " + str(cardAttributes["alignment"]) + " tendencies who's name is " + str(cardAttributes["cardName"])
-      print(descriptionContent)
+      # print(descriptionContent)
       cardAttributes["description"] = self.generateDescription(descriptionContent)
-      cardAttributes["cardArt"]  = self.generateCardArt( prompt = str(cardAttributes["description"]))
+      # cardAttributes["cardArt"]  = self.generateCardArt( prompt = str(cardAttributes["description"]))
 
-      img_data = requests.get(str(cardAttributes["cardArt"])).content #locally saving the image... will update code to use locally stored image links as openAI deletes theirs.
-      savedFilePath = os.path.join("./cardArt/" + str(nameGenderAndRace['cardName']) + str(random.randint(0, 5000))+'.png')
-      print("saving card image at : " + str(savedFilePath))
+      prompt = "Generate fantasy art from the following prompt but inside a " + str(random.choice(ART_BACKGROUNDS)) + " . the prompt is : " + str(cardAttributes["description"])
+      print(prompt)
+      img_data = requests.get(self.generateCardArt( prompt = prompt)).content #locally saving the image... will update code to use locally stored image links as openAI deletes theirs.
+      cardArtFileSaveNAme = str(nameGenderAndRace['cardName']).replace(" ", "-") +'.png'
+      savedFilePath = os.path.join("./cardArt/" + cardArtFileSaveNAme)
+      cardAttributes["cardArt"]  = self.HOST_URL + "/cardArt/" + cardArtFileSaveNAme
+      # print("saving card image at : " + str(cardAttributes["cardArt"]))
       with open(savedFilePath, 'wb') as handler:
         handler.write(img_data)
 
@@ -185,7 +143,7 @@ class CardRNGGenerationManager():
         incriminatedAttribute = str(random.choice(attributeList))
         cardAttributes[incriminatedAttribute] = int(cardAttributes[incriminatedAttribute]) + 1
         totalStatDistributionPool = totalStatDistributionPool -1
-      print(str(cardAttributes))
+      # print(str(cardAttributes))
       return cardAttributes
 
     def createMonarch(self):# payload will have the card attributes etc
